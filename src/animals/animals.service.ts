@@ -12,6 +12,7 @@ import { Location } from '../locations/entities/location.entity';
 import { User } from '../users/entities/user.entity';
 import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class AnimalsService {
@@ -57,10 +58,17 @@ export class AnimalsService {
     }
   }
 
-  async findAll() {
-    return this.animalRepo.find({
-      relations: ['registeredBy'], // location se carga sola (eager: true)
+  async findAll(pagination: PaginationDto) {
+    const page = pagination.page ?? 1;
+    const limit = pagination.limit ?? 10;
+
+    const [data, total] = await this.animalRepo.findAndCount({
+      relations: ['registeredBy'],
+      skip: (page - 1) * limit,
+      take: limit,
     });
+
+    return { data, total, page, limit };
   }
 
   async findOne(id: string) {
