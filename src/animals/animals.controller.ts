@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { AnimalsService } from './animals.service';
 import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
+import { FilterAnimalDto } from './dto/filter-animal.dto';
 
 @Controller('animals')
 export class AnimalsController {
@@ -22,8 +24,8 @@ export class AnimalsController {
   }
 
   @Get()
-  findAll() {
-    return this.animalsService.findAll();
+  findAll(@Query() filters: FilterAnimalDto) {
+    return this.animalsService.findAll(filters);
   }
 
   // ParseUUIDPipe valida que :id sea un UUID válido
