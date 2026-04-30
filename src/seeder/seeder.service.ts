@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Location } from '../locations/entities/location.entity';
 import { User } from '../users/entities/user.entity';
 import { Animal } from '../animals/entities/animal.entity';
+import { AdoptionRequest } from '../adoption-requests/entities/adoption-request.entity';
 
 @Injectable()
 export class SeederService {
@@ -16,6 +17,8 @@ export class SeederService {
     private readonly userRepo: Repository<User>,
     @InjectRepository(Animal)
     private readonly animalRepo: Repository<Animal>,
+    @InjectRepository(AdoptionRequest)
+    private readonly requestRepo: Repository<AdoptionRequest>,
   ) {}
 
   async seed() {
@@ -172,6 +175,35 @@ export class SeederService {
       },
     ]);
     this.logger.log(`  ✓ ${animals.length} animales`);
+
+    // ── 4. Solicitudes de adopción ───────────
+    const requests = await this.requestRepo.save([
+      {
+        user: users[0],
+        animal: animals[0],
+        status: 'pendiente',
+        message: 'Tengo patio grande y experiencia con perros',
+      },
+      {
+        user: users[1],
+        animal: animals[2],
+        status: 'aprobada',
+        message: 'Vivo sola y busco compañía tranquila',
+      },
+      {
+        user: users[2],
+        animal: animals[5],
+        status: 'pendiente',
+        message: 'Mi familia ama los gatos, tenemos espacio',
+      },
+      {
+        user: users[3],
+        animal: animals[6],
+        status: 'rechazada',
+        message: 'Apartamento pequeño pero mucho amor',
+      },
+    ]);
+    this.logger.log(`  ✓ ${requests.length} solicitudes`);
     this.logger.log('─────────────────────────────────────────');
     this.logger.log(
       `Seed completo → ${animals.filter((a) => a.estado === 'disponible').length} disponibles · ${animals.filter((a) => a.estado === 'adoptado').length} adoptados`,
@@ -180,6 +212,7 @@ export class SeederService {
 
   async clearAndSeed() {
     this.logger.warn('Limpiando tablas en orden (FK constraints)...');
+    await this.requestRepo.delete({});
     await this.animalRepo.query('DELETE FROM user_animal_favorites');
     await this.animalRepo.delete({});
     await this.userRepo.delete({});

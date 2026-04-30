@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Location } from '../locations/entities/location.entity';
 import { User } from '../users/entities/user.entity';
 import { Animal } from '../animals/entities/animal.entity';
+import { AdoptionRequest } from '../adoption-requests/entities/adoption-request.entity';
 import { SeederService } from './seeder.service';
 
 @Module({
@@ -19,12 +20,13 @@ import { SeederService } from './seeder.service';
         username: cfg.getOrThrow('DB_USER'),
         password: cfg.getOrThrow('DB_PASSWORD'),
         database: cfg.getOrThrow('DB_NAME'),
-        entities: [Location, User, Animal],
+        entities: [Location, User, Animal, AdoptionRequest],
         synchronize: false,
       }),
     }),
-    TypeOrmModule.forFeature([Location, User, Animal]),
+    TypeOrmModule.forFeature([Location, User, Animal, AdoptionRequest]),
   ],
   providers: [SeederService],
 })
 export class SeederModule {}
+
